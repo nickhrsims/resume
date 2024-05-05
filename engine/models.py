@@ -76,39 +76,26 @@ class Resume(BaseModel):
     associations: list[Association]
     publications: list[Publication]
 
-    def __init__(
-        self,
-        *,
-        personal: PersonalInfo,
-        experience: list[Job],
-        education: list[School],
-        skill_categories: list[SkillCategory],
-        project_categories: list[ProjectCategory],
-        associations: list[Association],
-        publications: list[Publication],
-    ):
+    def without_hidden_entries(self):
+        filtered_resume = self.model_copy(deep=True)
+
         # Filter-out hidden projects and project categories
-        project_categories = [
-            category for category in project_categories if not category.hidden
+        filtered_resume.project_categories = [
+            category
+            for category in filtered_resume.project_categories
+            if not category.hidden
         ]
 
-        for category in project_categories:
+        for category in filtered_resume.project_categories:
             category.projects = [
                 project for project in category.projects if not project.hidden
             ]
 
         # Filter-out hidden skill categories
-        skill_categories = [
-            category for category in skill_categories if not category.hidden
+        filtered_resume.skill_categories = [
+            category
+            for category in filtered_resume.skill_categories
+            if not category.hidden
         ]
 
-        # Defer filtered context object to BaseModel initializer
-        super().__init__(
-            personal=personal,
-            experience=experience,
-            education=education,
-            skill_categories=skill_categories,
-            project_categories=project_categories,
-            associations=associations,
-            publications=publications,
-        )
+        return filtered_resume

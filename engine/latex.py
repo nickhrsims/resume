@@ -1,6 +1,4 @@
-from os.path import abspath as get_absolute_path
-
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, BaseLoader
 
 
 class LatexEnvironment(Environment):
@@ -16,5 +14,5 @@ class LatexEnvironment(Environment):
             line_comment_prefix=r"%#",
             trim_blocks=True,
             autoescape=False,
-            loader=FileSystemLoader(get_absolute_path(".")),
+            loader=BaseLoader(),
         )
