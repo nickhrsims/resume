@@ -76,6 +76,21 @@ class Resume(BaseModel):
     associations: list[Association]
     publications: list[Publication]
 
+    def without_email(self):
+        filtered_resume = self.model_copy(deep=True)
+        filtered_resume.personal.email = ""
+        return filtered_resume
+
+    def without_phone(self):
+        filtered_resume = self.model_copy(deep=True)
+        filtered_resume.personal.phone = ""
+        return filtered_resume
+
+    def without_github(self):
+        filtered_resume = self.model_copy(deep=True)
+        filtered_resume.personal.github = ""
+        return filtered_resume
+
     def without_hidden_entries(self):
         filtered_resume = self.model_copy(deep=True)
 

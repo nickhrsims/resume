@@ -27,7 +27,32 @@ from .latex import LatexEnvironment
     help="Python module providing a valid `context` object for rendering the given template. If this argument is omitted, config will be read from `stdin` instead.",
     required=False,
 )
-def main(template_file: TextIO, config_file: TextIO | None):
+@click.option(
+    "-oe",
+    "--omit-email",
+    "omit_email",
+    type=click.BOOL,
+    is_flag=True,
+    help="Remove email address from generated resume (if present)",
+    default=False,
+    show_default=True,
+)
+@click.option(
+    "-op",
+    "--omit-phone",
+    "omit_phone",
+    type=click.BOOL,
+    is_flag=True,
+    help="Remove phone number from generated resume (if present)",
+    default=False,
+    show_default=True,
+)
+def main(
+    template_file: TextIO,
+    config_file: TextIO | None,
+    omit_email: bool,
+    omit_phone: bool,
+):
     assert template_file
 
     ### --- Shadow `config_file` from `stdin` if parameter omitted
@@ -49,6 +74,13 @@ def main(template_file: TextIO, config_file: TextIO | None):
     resume: Resume | None = None
     try:
         resume = Resume.model_validate_json(config_file.read())
+
+        ### --- Filter out any PII on-demand
+        if omit_email:
+            resume = resume.without_email()
+        if omit_phone:
+            resume = resume.without_phone()
+
     except ValidationError as error:
         print(f"Config Validation: {error}")
         return
